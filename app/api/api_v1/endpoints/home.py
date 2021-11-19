@@ -7,4 +7,4 @@ router = APIRouter()
 
 @router.get('/')
 def home():
-    return {'Welcome': settings.PROJECT_NAME}
+    return {'Welcome to API': settings.PROJECT_NAME}
