@@ -21,3 +21,7 @@ class Person(PersonBase):
 
 class PersonCreate(PersonBase):
     pass
+
+
+class PersonUpdate(PersonBase):
+    pass
