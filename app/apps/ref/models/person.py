@@ -13,3 +13,6 @@ class PersonTable(Base):
     name_lfm = Column(String(length=150), nullable=True, index=True)
     name_fml = Column(String(length=150), nullable=True, index=True)
     pers_num = Column(String(length=14), unique=True, index=True)
+
+
+persons = PersonTable.__table__
