@@ -1,4 +1,4 @@
-from apps.ref.models.person import PersonTable
-from apps.ref.models.employee import EmployeeTable
+from apps.ref.models.person import Person
+from apps.ref.models.employee import Employee
 
 from db.session import Base

@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 from db.session import Base
 
 
-class PersonTable(Base):
+class Person(Base):
     __tablename__ = 'persons'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -14,5 +15,7 @@ class PersonTable(Base):
     name_fml = Column(String(length=150), nullable=True, index=True)
     pers_num = Column(String(length=14), unique=True, index=True)
 
+    employees = relationship('Employee', back_populates='person')
 
-persons = PersonTable.__table__
+
+persons = Person.__table__
