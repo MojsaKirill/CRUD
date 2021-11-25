@@ -1,14 +1,15 @@
-from db.init_db import init_db
-from db.session import SessionLocal
+import asyncio
+
+from db.init_db import init_models
 
 
-def init() -> None:
-    db = SessionLocal()
-    init_db(db)
+def db_init_models() -> None:
+    asyncio.run(init_models())
+    print('DB init')
 
 
 def main() -> None:
-    init()
+    db_init_models()
 
 
 if __name__ == '__main__':
