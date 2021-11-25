@@ -4,9 +4,8 @@ from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
 from core.config import settings
 from core.exceptions import DuplicatedEntryError
@@ -29,7 +28,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             result = await db.query(self.model).filter(self.model.id == id).first()
         return result
 
-    async def get_list(self, db: AsyncSession, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
+    async def get_list(self, db: AsyncSession, *,
+                       skip: int = 0, limit: int = 100) -> List[ModelType]:
         if settings.FUTURE:
             rows = await db.execute(select(self.model).offset(skip).limit(limit))
             results = rows.scalars().all()
@@ -64,9 +64,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             await db.commit()
             await db.refresh(obj_db)
             return obj_db
-        except Exception:
+        except IntegrityError as ex:
             await db.rollback()
-            raise HTTPException(status_code=422, detail='Error update record.')
+            raise DuplicatedEntryError(f'The record is already exist. Error: {ex.detail}')
 
     async def delete(self, db: AsyncSession, *, id: int) -> ModelType:
         obj_db = await self.get(db, id)
