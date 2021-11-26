@@ -7,7 +7,6 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.config import settings
 from core.exceptions import DuplicatedEntryError
 from db.session import Base
 
@@ -21,20 +20,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     async def get(self, db: AsyncSession, id: Any) -> Optional[ModelType]:
-        if settings.FUTURE:
-            row = await db.execute(select(self.model).where(self.model.id == id))
-            result = row.scalar_one_or_none()
-        else:
-            result = await db.query(self.model).filter(self.model.id == id).first()
+        row = await db.execute(select(self.model).where(self.model.id == id))
+        result = row.scalar_one_or_none()
         return result
 
     async def get_list(self, db: AsyncSession, *,
                        skip: int = 0, limit: int = 100) -> List[ModelType]:
-        if settings.FUTURE:
-            rows = await db.execute(select(self.model).offset(skip).limit(limit))
-            results = rows.scalars().all()
-        else:
-            results = await db.query(self.model).offset(skip).limit(limit).all()
+        rows = await db.execute(select(self.model).offset(skip).limit(limit))
+        results = rows.scalars().all()
         return results
 
     async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
