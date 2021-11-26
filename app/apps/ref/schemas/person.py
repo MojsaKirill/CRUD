@@ -32,10 +32,10 @@ class PersonCreate(PersonBase):
 
 class PersonUpdate(PersonBase):
     pass
-    # last_name: Optional[str] = None
+    last_name: Optional[str] = None
 
-    # @validator('last_name')
-    # def last_name_check(cls, v: str):
-    #     if v is None:
-    #         raise ValueError('required field')
-    #     return v
+    @validator('last_name')
+    def last_name_check(cls, v: str):
+        if v is None:
+            raise ValueError('field required')
+        return v
