@@ -1,11 +1,12 @@
 import asyncio
 
-from db.init_db import init_models
+from db.init_db import init_models, make_fake_data
 
 
 def db_init_models() -> None:
-    asyncio.run(init_models())
-    print('DB init')
+    # asyncio.run(init_models())
+    # print('DB init')
+    asyncio.run(make_fake_data())
 
 
 def main() -> None:
