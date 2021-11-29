@@ -1,13 +1,14 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.exceptions import DuplicatedEntryError
+from core.exceptions import DBOperationError, DuplicatedEntryError
 from db.session import Base
 
 ModelType = TypeVar('ModelType', bound=Base)
@@ -33,14 +34,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         obj_db = self.model(**obj_in_data)
-        db.add(obj_db)
-        try:
-            await db.commit()
+        async with write_to_db(db) as writed:
+            db.add(obj_db)
+            result = writed
+        if result:
             await db.refresh(obj_db)
             return obj_db
-        except IntegrityError as ex:
-            await db.rollback()
-            raise DuplicatedEntryError(f'The record is already exist. Error: {ex.detail}')
+
+        # try:
+        #     await db.commit()
+        #     await db.refresh(obj_db)
+        #     return obj_db
+        # except SQLAlchemyError as ex:
+        #     await db.rollback()
+        #     raise HTTPException(status_code=422, detail=f'The record is already exist. Error: {ex}')
 
     async def update(self, db: AsyncSession, *, obj_db: ModelType,
                      obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
@@ -67,6 +74,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             await db.delete(obj_db)
             await db.commit()
             return obj_db
-        except Exception:
+        except SQLAlchemyError as ex:
             await db.rollback()
-            raise HTTPException(status_code=422, detail='Error delete record.')
+            raise HTTPException(status_code=422, detail=f'Error delete record. Error: {ex}')
+
+
+@asynccontextmanager
+async def write_to_db(db: AsyncSession) -> AsyncIterator[bool]:
+    try:
+        yield True
+        await db.commit()
+    except SQLAlchemyError as ex:
+        await db.rollback()
+        raise DBOperationError(f'Error: {ex}')
