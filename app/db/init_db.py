@@ -11,25 +11,25 @@ async def init_models():
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def make_fake_data():
+async def make_fake_data(count: int = 100):
     db = SessionAsync()
 
     faker = Faker(locale='ru_RU')
 
     items = []
-    for i in range(150):
+    for i in range(count):
         if i % 2 == 0:
-            l = faker.last_name_male()
-            f = faker.first_name_male()
-            m = faker.middle_name_male()
+            ln = faker.last_name_male()
+            fn = faker.first_name_male()
+            mn = faker.middle_name_male()
         else:
-            l = faker.last_name_female()
-            f = faker.first_name_female()
-            m = faker.middle_name_female()
+            ln = faker.last_name_female()
+            fn = faker.first_name_female()
+            mn = faker.middle_name_female()
 
-        n = faker.unique.random_number(digits=14, fix_len=True)
+        pn = faker.unique.random_number(digits=14, fix_len=True)
 
-        items.append(Person(last_name=l, first_name=f, middle_name=m, pers_num=n))
+        items.append(Person(last_name=ln, first_name=fn, middle_name=mn, pers_num=pn))
 
     db.add_all(items)
     await db.commit()
