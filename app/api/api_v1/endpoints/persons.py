@@ -25,7 +25,7 @@ async def list_persons(db: AsyncSession = Depends(deps.get_session),
     return results
 
 
-@router.post('/create', response_model=Person)
+@router.post('/create', response_model=Person, status_code=201)
 async def create_person(item: PersonCreate,
                         db: AsyncSession = Depends(deps.get_session)) -> Any:
     result = await cruds.person.create(db=db, obj_in=item)
