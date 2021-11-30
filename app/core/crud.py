@@ -34,9 +34,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         obj_db = self.model(**obj_in_data)
-        async with write_to_db(db) as writed:
+        async with write_to_db(db) as written:
             db.add(obj_db)
-            result = writed
+            result = written
         if result:
             await db.refresh(obj_db)
             return obj_db
