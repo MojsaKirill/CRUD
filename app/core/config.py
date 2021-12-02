@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     PROJECT_VERSION: str = config('PROJECT_VERSION', cast=str,
                                   default='0.0.1')
     SQLALCHEMY_DATABASE_URL: str = config('SQLALCHEMY_DATABASE_URL', cast=str,
-                                          # default='sqlite+pysqlite:///./crud.db')
                                           default='sqlite+aiosqlite:///./crud.db')
     FIRST_SUPERUSER_NAME: str = config('FIRST_SUPERUSER_NAME', cast=str,
                                        default='admin')

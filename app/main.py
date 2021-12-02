@@ -5,23 +5,21 @@ import warnings
 
 from fastapi import FastAPI
 import uvicorn
-# from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.api_v1.api import api_router
 from core.config import settings
-# from db.session import session_getter
+
 
 os.environ['SQLALCHEMY_WARN_20'] = 'True'
 if not sys.warnoptions:
     warnings.simplefilter("default")
+
 
 app = FastAPI(title=settings.PROJECT_NAME,
               version=settings.PROJECT_VERSION,
               openapi_url=f'{settings.API_V1_STR}/openapi.json',
               debug=settings.DEBUG)
 
-# app.dependency_overrides[AsyncSession] = session_getter(settings.SQLALCHEMY_DATABASE_URL,
-#                                                         settings.DEBUG)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

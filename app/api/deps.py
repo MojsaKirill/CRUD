@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.session import SessionAsync
+# from db.session import SessionAsync
 
 
-async def get_session() -> AsyncSession:
-    async with SessionAsync() as session:
-        yield session
+# async def get_session_old() -> AsyncSession:
+#     async with SessionAsync() as session:
+#         yield session

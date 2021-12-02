@@ -2,17 +2,18 @@ from faker import Faker
 
 from apps.ref.models.person import Person
 from db.base import Base
-from db.session import EngineAsync, SessionAsync
+from db.session import SessionManager
 
 
 async def init_models():
-    async with EngineAsync.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+    pass
+    # async with EngineAsync.begin() as conn:
+    #     await conn.run_sync(Base.metadata.drop_all)
+    #     await conn.run_sync(Base.metadata.create_all)
 
 
 async def make_fake_data(count: int = 100):
-    db = SessionAsync()
+    db = SessionManager()
 
     faker = Faker(locale='ru_RU')
 
@@ -31,5 +32,5 @@ async def make_fake_data(count: int = 100):
 
         items.append(Person(last_name=ln, first_name=fn, middle_name=mn, pers_num=pn))
 
-    db.add_all(items)
-    await db.commit()
+    async with db.obtain_session() as sess:
+        sess.add_all(items)
