@@ -1,8 +1,11 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
+from starlette import status
+from starlette.responses import JSONResponse
 
 from db.session import Base, SessionManager
 
@@ -53,4 +56,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def delete(self, *, id: int) -> Any:
         async with self.db.obtain_session() as sess:
             result = await sess.execute(delete(self.model).where(self.model.id == id))
-        return {'result': f'Deleted records: {result.rowcount}'}
+        if result.rowcount == 1:
+            return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
+        raise HTTPException(status_code=404, detail=f'Record with id={id} not found')
