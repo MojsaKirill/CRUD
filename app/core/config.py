@@ -26,3 +26,42 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+LOGGING_CONFIG = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'default_formatter': {
+            'format': '%(asctime)s [%(name)s] => %(levelname)s: %(message)s',
+            # 'datefmt': '%Y.%m.%d %H:%M:%S',
+        },
+    },
+
+    'handlers': {
+        'file_handler': {
+            'class': 'logging.FileHandler',
+            'formatter': 'default_formatter',
+            'filename': 'main.log',
+            'encoding': 'UTF-8',
+        },
+        'stream_handler': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default_formatter',
+            'stream': 'sys.stdout',
+        },
+    },
+
+    'loggers': {
+        'main': {
+            'handlers': ['file_handler'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'db.session': {
+            'handlers': ['file_handler'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+    }
+}

@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,6 +7,8 @@ from sqlalchemy.orm import sessionmaker
 
 from core.config import settings
 from core.exceptions import DBOperationError
+
+logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
@@ -33,6 +36,8 @@ class SessionManager:
             yield session
             await session.commit()
         except BaseException as e:
+            logger.error('Obtain session: failed')
+            logger.exception(e)
             await session.rollback()
             raise DBOperationError(f'Error: {e}')
         finally:

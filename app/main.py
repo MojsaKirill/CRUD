@@ -1,4 +1,5 @@
 # Основной файл проекта
+import logging
 import os
 import sys
 import warnings
@@ -7,8 +8,10 @@ from fastapi import FastAPI
 import uvicorn
 
 from api.api_v1.api import api_router
-from core.config import settings
+from core.config import LOGGING_CONFIG, settings
 
+
+logging.config.dictConfig(LOGGING_CONFIG)
 
 os.environ['SQLALCHEMY_WARN_20'] = 'True'
 if not sys.warnoptions:
