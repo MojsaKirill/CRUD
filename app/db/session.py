@@ -1,14 +1,13 @@
-import logging
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from core.config import settings
+from core.config import init_logging, settings
 from core.exceptions import DBOperationError
 
-logger = logging.getLogger(__name__)
+logger = init_logging(__name__)
 
 Base = declarative_base()
 
@@ -35,10 +34,10 @@ class SessionManager:
         try:
             yield session
             await session.commit()
-        except BaseException as e:
+        except Exception as e:
             logger.error('Obtain session: failed')
             logger.exception(e)
             await session.rollback()
-            raise DBOperationError(f'Error: {e}')
+            raise DBOperationError(e)
         finally:
             await session.close()

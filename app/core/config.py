@@ -1,4 +1,7 @@
 # Конфигурация проекта
+import logging.config
+from logging import Logger
+
 from pydantic import BaseSettings
 from starlette.config import Config
 
@@ -7,7 +10,7 @@ config = Config('.env')
 
 class Settings(BaseSettings):
     DEBUG: bool = config('DEBUG', cast=bool, default=True)
-    FUTURE: bool = config('FUTURE', cast=bool, default=True)   # Use 2.0 SQLAlchemy style
+    FUTURE: bool = config('FUTURE', cast=bool, default=True)  # Use 2.0 SQLAlchemy style
     API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = config('SECRET_KEY', cast=str,
                              default='FaOsibHOugjgCdQDAaC6Apnblx9m6aF6FPgHqAA/3WnSKDftsf2I99dAA5LEfFG5qJCVe3aqkXLyJ3pZ')
@@ -34,7 +37,12 @@ LOGGING_CONFIG = {
     'formatters': {
         'default_formatter': {
             'format': '%(asctime)s [%(name)s] => %(levelname)s: %(message)s',
-            # 'datefmt': '%Y.%m.%d %H:%M:%S',
+            'datefmt': '%Y.%m.%d %H:%M:%S',
+        },
+        'uvicorn_formatter': {
+            '()': 'uvicorn.logging.DefaultFormatter',
+            'format': '%(levelprefix)s %(asctime)s: %(message)s',
+            'datefmt': '%Y.%m.%d %H:%M:%S',
         },
     },
 
@@ -45,13 +53,24 @@ LOGGING_CONFIG = {
             'filename': 'main.log',
             'encoding': 'UTF-8',
         },
+        'file_handler_db': {
+            'class': 'logging.FileHandler',
+            'formatter': 'default_formatter',
+            'filename': 'db.log',
+            'encoding': 'UTF-8',
+        },
         'stream_handler': {
             'class': 'logging.StreamHandler',
             'formatter': 'default_formatter',
             'stream': 'sys.stdout',
         },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'uvicorn_formatter',
+            'stream': 'ext://sys.stderr',
+            'level': 'DEBUG',
+        },
     },
-
     'loggers': {
         'main': {
             'handlers': ['file_handler'],
@@ -59,9 +78,16 @@ LOGGING_CONFIG = {
             'propagate': True
         },
         'db.session': {
-            'handlers': ['file_handler'],
+            'handlers': ['file_handler_db'],
             'level': 'DEBUG',
-            'propagate': True
+            # 'propagate': True
         },
     }
 }
+
+
+def init_logging(name: str = 'main') -> Logger:
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger = logging.getLogger(name)
+
+    return logger

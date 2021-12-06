@@ -7,5 +7,5 @@ class DuplicatedEntryError(HTTPException):
 
 
 class DBOperationError(HTTPException):
-    def __init__(self, message: str):
-        super().__init__(status_code=422, detail=message)
+    def __init__(self, e: Exception):
+        super().__init__(status_code=422, detail=e.statement)
