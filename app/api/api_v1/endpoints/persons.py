@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, HTTPException
 
@@ -17,8 +17,8 @@ async def get_person(obj_id: int) -> Any:
 
 
 @router.get('/', response_model=List[Person])
-async def list_persons(skip: int = 0, limit: int = 100) -> Any:
-    results = await cruds.person.get_list(skip=skip, limit=limit)
+async def list_persons(q: Optional[str] = None, skip: int = 0, limit: int = 100) -> Any:
+    results = await cruds.person.get_list(q, skip=skip, limit=limit)
     return results
 
 

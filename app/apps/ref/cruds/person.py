@@ -1,7 +1,7 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import or_, select
 
 from apps.ref.models.person import Person
 from apps.ref.schemas.person import PersonCreate, PersonUpdate
@@ -10,6 +10,16 @@ from core.utils import get_fml, get_lfm
 
 
 class CRUDPerson(CRUDBase[Person, PersonCreate, PersonUpdate]):
+
+    async def get_list(self, *args, skip: int = 0, limit: int = 100) -> List[Person]:
+        sql = select(self.model).offset(skip).limit(limit)
+        if isinstance(*args, str):
+            sql = sql.where(or_(Person.pers_num.like(f'%{args[0]}%'),
+                                Person.last_name.like(f'%{args[0]}%')))
+        async with self.db.obtain_session() as sess:
+            rows = await sess.execute(sql)
+        results = rows.scalars().all()
+        return results
 
     async def update(self, *, obj_db: Person,
                      obj_in: Union[PersonUpdate, Dict[str, Any]]) -> Person:
