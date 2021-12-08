@@ -18,7 +18,7 @@ def gen_name_fml(context):
 
 
 class Person(Base):
-    __tablename__ = 'persons'
+    __tablename__ = 'person'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     last_name = Column(String(length=100), nullable=False)
