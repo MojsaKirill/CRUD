@@ -25,3 +25,7 @@ class EmployeeCreate(EmployeeBase):
 
 class EmployeeUpdate(EmployeeBase):
     pass
+
+
+class EmployeeFromDB(EmployeeBase):
+    id: int = Field(..., title='Код')

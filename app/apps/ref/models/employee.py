@@ -12,9 +12,7 @@ class Employee(Base):
     person_id = Column(Integer, ForeignKey('person.id', ondelete='SET NULL'), nullable=True)
 
     # https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html
-    person = relationship('Person', back_populates='employees',
-                          lazy='joined',
-                          innerjoin=False)
+    person = relationship('Person', back_populates='employees', lazy='joined', innerjoin=False)
 
 
 employees = Employee.__table__

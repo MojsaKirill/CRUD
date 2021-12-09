@@ -24,7 +24,6 @@ class PersonCreate(PersonBase):
 
 
 class PersonUpdate(PersonBase):
-    pass
     last_name: str = Field(None, title='Фамилия', min_length=3, max_length=100)
 
     @validator('last_name')

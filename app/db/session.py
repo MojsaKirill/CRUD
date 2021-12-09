@@ -21,7 +21,6 @@ class SessionManager:
                 pool_pre_ping=True,
                 echo=settings.DEBUG,
                 future=settings.FUTURE,
-                connect_args={'check_same_thread': False},
             ),
             class_=AsyncSession,
             expire_on_commit=False,

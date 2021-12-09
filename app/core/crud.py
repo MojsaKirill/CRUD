@@ -31,9 +31,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         results = rows.scalars().all()
         return results
 
-    async def create(self, *, obj_in: CreateSchemaType) -> ModelType:
-        obj_in_data = jsonable_encoder(obj_in)
-        obj_db = self.model(**obj_in_data)
+    async def create(self, *, obj_in: CreateSchemaType) -> Optional[ModelType]:
+        insert_data = obj_in.dict(exclude_unset=True)
+        obj_db = self.model(**insert_data)
         async with self.db.obtain_session() as sess:
             sess.add(obj_db)
         return obj_db

@@ -29,6 +29,7 @@ class Person(Base):
     pers_num = Column(String(length=14), nullable=True, unique=True, index=True)
 
     employees = relationship('Employee', back_populates='person')
+    # invoices = relationship('Invoice', back_populates='person')
 
     @validates('last_name', 'first_name', 'middle_name')
     def convert_title(self, key, value: str):

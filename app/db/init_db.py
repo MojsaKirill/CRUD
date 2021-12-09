@@ -28,7 +28,7 @@ async def make_fake_data(count: int = 100):
             fn = faker.first_name_female()
             mn = faker.middle_name_female()
 
-        pn = faker.unique.random_number(digits=14, fix_len=True)
+        pn = str(faker.unique.random_number(digits=14, fix_len=True))
 
         items.append(Person(last_name=ln, first_name=fn, middle_name=mn, pers_num=pn))
 
