@@ -17,7 +17,7 @@ class SessionManager:
     def __init__(self):
         self._session_factory = sessionmaker(
             bind=create_async_engine(
-                settings.SQLALCHEMY_DATABASE_URL,
+                settings.SQLALCHEMY_DATABASE_URL_ASYNC,
                 pool_pre_ping=True,
                 echo=settings.DEBUG,
                 future=settings.FUTURE,

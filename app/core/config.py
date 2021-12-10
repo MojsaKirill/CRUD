@@ -1,11 +1,13 @@
 # Конфигурация проекта
 import logging.config
 from logging import Logger
+from pathlib import Path
 
 from pydantic import BaseSettings
 from starlette.config import Config
 
-config = Config('.env')
+BASE_DIR = Path(__file__).resolve().parent.parent
+config = Config(str(BASE_DIR) + '/.env')
 
 
 class Settings(BaseSettings):
@@ -18,8 +20,10 @@ class Settings(BaseSettings):
                                default='CRUD Project')
     PROJECT_VERSION: str = config('PROJECT_VERSION', cast=str,
                                   default='0.0.1')
-    SQLALCHEMY_DATABASE_URL: str = config('SQLALCHEMY_DATABASE_URL', cast=str,
-                                          default='sqlite+aiosqlite:///./crud.db')
+    SQLALCHEMY_DATABASE_URL_ASYNC: str = config('SQLALCHEMY_DATABASE_URL_ASYNC', cast=str,
+                                                default='sqlite+aiosqlite:///./crud.db')
+    SQLALCHEMY_DATABASE_URL_SYNC: str = config('SQLALCHEMY_DATABASE_URL_SYNC', cast=str,
+                                               default='sqlite:///./crud.db')
     FIRST_SUPERUSER_NAME: str = config('FIRST_SUPERUSER_NAME', cast=str,
                                        default='admin')
     FIRST_SUPERUSER_EMAIL: str = config('FIRST_SUPERUSER_EMAIL', cast=str,
@@ -50,13 +54,13 @@ LOGGING_CONFIG = {
         'file_handler': {
             'class': 'logging.FileHandler',
             'formatter': 'default_formatter',
-            'filename': 'main.log',
+            'filename': str(BASE_DIR) + '/main.log',
             'encoding': 'UTF-8',
         },
         'file_handler_db': {
             'class': 'logging.FileHandler',
             'formatter': 'default_formatter',
-            'filename': 'db.log',
+            'filename': str(BASE_DIR) + '/db.log',
             'encoding': 'UTF-8',
         },
         'stream_handler': {
