@@ -12,7 +12,7 @@ class Currency(Base):
     rate = Column(Numeric(precision=10, scale=5), nullable=False)
     date_start = Column(Date(), nullable=False)
 
-    # invoices = relationship('Invoice', back_populates='currency')
+    invoices = relationship('Invoice', back_populates='currency')
 
     # __table_args__ = (Index('currency_uq01', 'code', 'date', unique=True),)
 

@@ -23,3 +23,10 @@ class CurrencyCreate(CurrencyBase):
 
 class CurrencyUpdate(CurrencyBase):
     pass
+
+
+class CurrencyFromDB(BaseModel):
+    code: str = Field(..., title='Код')
+
+    class Config:
+        orm_mode = True

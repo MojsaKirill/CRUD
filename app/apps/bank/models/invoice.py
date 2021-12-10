@@ -6,10 +6,10 @@ from sqlalchemy.orm import relationship
 from db.session import Base
 
 
-class Statuses(enum.Enum):
-    progress = 1
-    accept = 2
-    reject = 3
+class Statuses(str, enum.Enum):
+    progress = 'progress'
+    accept = 'accept'
+    reject = 'reject'
 
 
 class Invoice(Base):
@@ -22,5 +22,5 @@ class Invoice(Base):
     status = Column(Enum(Statuses, create_constraint=True, name='statuses'), nullable=False,
                     default=Statuses.progress)
 
-    # person = relationship('Person', back_populates='invoices', lazy='joined', innerjoin=False)
-    # currency = relationship('Currency', back_populates='invoices', lazy='joined', innerjoin=False)
+    person = relationship('Person', back_populates='invoices', lazy='joined', innerjoin=False)
+    currency = relationship('Currency', back_populates='invoices', lazy='joined', innerjoin=False)
