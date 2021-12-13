@@ -17,6 +17,13 @@ class Currency(CurrencyBase):
         orm_mode = True
 
 
+class CurrencyView(CurrencyBase):
+    id: int = Field(..., title='ID')
+
+    class Config:
+        orm_mode = True
+
+
 class CurrencyCreate(CurrencyBase):
     pass
 
@@ -26,7 +33,9 @@ class CurrencyUpdate(CurrencyBase):
 
 
 class CurrencyFromDB(BaseModel):
-    code: str = Field(..., title='Код')
+    code: str = Field(..., title='Код', min_length=3, max_length=3)
+    rate: decimal.Decimal = Field(..., title='Курс', gt=0)
+    date_start: datetime.date = Field(..., title='Дата')
 
     class Config:
         orm_mode = True
