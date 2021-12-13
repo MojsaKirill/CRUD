@@ -40,6 +40,7 @@ class InvoiceUpdate(InvoiceBase):
 
 
 class InvoiceFromDB(InvoiceBase):
+    id: int = Field(..., title='ID')
     person: Optional[PersonFromDB] = Field(None, title='Персона')
     currency: Optional[CurrencyFromDB] = Field(None, title='Валюта')
     status: Statuses = Field(None, title='Статус')
