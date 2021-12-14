@@ -1,5 +1,9 @@
 from typing import Optional
 
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+
 
 def __get_first_alpha_upper_dot(item: str = None) -> str:
     result: str = ''
@@ -53,3 +57,10 @@ def get_fml(last_name: str, first_name: str = None, middle_name: str = None) -> 
 
     return f'{fn}{mn} {ln}'
 
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)

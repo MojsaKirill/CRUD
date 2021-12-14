@@ -11,7 +11,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str
+    username: Optional[str] = None
 
 
 class UserBase(BaseModel):
@@ -55,3 +55,8 @@ class UserFromDB(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
