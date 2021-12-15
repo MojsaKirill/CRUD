@@ -15,10 +15,10 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    username: str = Field(..., title='Имя пользователя')
+    # username: str = Field(..., title='Имя пользователя')
     email: Optional[str] = Field(None, title='Адрес e-mail')
-    balance: decimal.Decimal = Field(..., title='Баланс')
-    banker: bool = Field(..., title='Признак банкира')
+    # balance: decimal.Decimal = Field(..., title='Баланс')
+    # banker: bool = Field(..., title='Признак банкира')
 
     @validator('email')
     def _validate_email(cls, v: Any) -> Optional[str]:
@@ -28,28 +28,31 @@ class UserBase(BaseModel):
         return v
 
 
-class UserView(BaseModel):
+class UserView(UserBase):
     id: int = Field(..., title='ID')
     username: str = Field(..., title='Имя пользователя')
+    balance: decimal.Decimal = Field(..., title='Баланс')
+    banker: bool = Field(..., title='Признак банкира')
 
     class Config:
         orm_mode = True
 
 
 class UserCreate(UserBase):
-    password: str
+    username: str = Field(..., title='Имя пользователя')
+    password: str = Field(..., title='Пароль')
     balance: Optional[decimal.Decimal] = Field(0, title='Баланс')
     banker: Optional[bool] = Field(False, title='Признак банкира')
 
 
 class UserUpdate(UserBase):
-    password: Optional[str] = Field(None, title='Пароль')
+    balance: Optional[decimal.Decimal] = Field(None, title='Баланс')
+    banker: Optional[bool] = Field(None, title='Признак банкира')
 
 
 class UserFromDB(UserBase):
     id: int = Field(..., title='ID')
     username: str = Field(..., title='Имя пользователя')
-    email: Optional[str] = Field(None, title='Адрес e-mail')
     balance: decimal.Decimal = Field(..., title='Баланс')
     banker: bool = Field(..., title='Признак банкира')
 

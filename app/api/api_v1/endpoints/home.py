@@ -10,5 +10,5 @@ router = APIRouter()
 
 
 @router.get('/')
-async def home(user: User = Depends(get_current_user)):
-    return {f'{user.username} welcome to API': settings.PROJECT_NAME}
+async def home(current_user: User = Depends(get_current_user)):
+    return {f'{current_user.username} welcome to API': settings.PROJECT_NAME}

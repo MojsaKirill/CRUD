@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -25,6 +26,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')
         if username is None:
+            raise credentials_exception
+        if payload.get('exp') < time.time():
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
