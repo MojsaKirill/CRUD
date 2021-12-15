@@ -3,26 +3,26 @@ from typing import Any, List
 from fastapi import APIRouter, HTTPException
 
 from apps.bank.cruds import currency
-from apps.bank.schemas.currency import CurrencyCreate, CurrencyFromDB, CurrencyUpdate, CurrencyView
+from apps.bank.schemas.currency import CurrencyCreate, CurrencyUpdate, CurrencyView
 
 router = APIRouter()
 
 
-@router.get('/{obj_id}', response_model=CurrencyFromDB)
-async def get_currency(obj_id1: int) -> Any:
-    result = await currency.get(id=obj_id1)
+@router.get('/{obj_id}', response_model=CurrencyView)
+async def get_currency(obj_id: int) -> Any:
+    result = await currency.get(id=obj_id)
     if not result:
         raise HTTPException(status_code=404, detail='Currency not found!')
     return result
 
 
-@router.get('/', response_model=List[CurrencyFromDB])
+@router.get('/', response_model=List[CurrencyView])
 async def list_currencies(skip: int = 0, limit: int = 100) -> Any:
     results = await currency.get_list(skip=skip, limit=limit)
     return results
 
 
-@router.post('/create', response_model=CurrencyFromDB, status_code=201)
+@router.post('/create', response_model=CurrencyView, status_code=201)
 async def create_currency(item: CurrencyCreate) -> Any:
     result = await currency.create(obj_in=item)
     return result

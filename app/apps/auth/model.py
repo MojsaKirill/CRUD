@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Identity, String, Numeric, Boolean
+from sqlalchemy.orm import relationship
 
 from db.session import Base
 
@@ -11,5 +12,6 @@ class User(Base):
     password = Column(String(100), nullable=False)
     email = Column(String(70), unique=True, nullable=True)
     balance = Column(Numeric(precision=10, scale=2), nullable=False, server_default='0')
-    banker = Column(Boolean, nullable=False, default=False)
+    banker = Column(Boolean, nullable=False, server_default='False')
 
+    invoices = relationship('Invoice', back_populates='user')

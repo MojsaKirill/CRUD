@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 from apps.auth.crud import get_user_auth
+from apps.auth.model import User
 from apps.auth.schema import TokenData
 
 SECRET_KEY = 'FaOsibHOugjgCdQDAaC6Apnblx9m6aF6FPgHqAA/3WnSKDftsf2I99dAA5LEfFG5qJCVe3aqkXLyJ3pZ'

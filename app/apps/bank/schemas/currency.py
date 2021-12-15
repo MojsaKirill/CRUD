@@ -1,20 +1,14 @@
 import datetime
 import decimal
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class CurrencyBase(BaseModel):
     code: str = Field(..., title='Код', min_length=3, max_length=3)
     rate: decimal.Decimal = Field(..., title='Курс', gt=0)
+    scale: int = Field(1, title='Шкала', ge=1)
     date_start: datetime.date = Field(..., title='Дата')
-
-
-class Currency(CurrencyBase):
-    id: int = Field(..., title='ID')
-
-    class Config:
-        orm_mode = True
 
 
 class CurrencyView(CurrencyBase):
@@ -30,12 +24,3 @@ class CurrencyCreate(CurrencyBase):
 
 class CurrencyUpdate(CurrencyBase):
     pass
-
-
-class CurrencyFromDB(BaseModel):
-    code: str = Field(..., title='Код', min_length=3, max_length=3)
-    rate: decimal.Decimal = Field(..., title='Курс', gt=0)
-    date_start: datetime.date = Field(..., title='Дата')
-
-    class Config:
-        orm_mode = True

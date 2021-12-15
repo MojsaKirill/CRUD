@@ -50,14 +50,14 @@ class UserUpdate(UserBase):
     banker: Optional[bool] = Field(None, title='Признак банкира')
 
 
-class UserFromDB(UserBase):
-    id: int = Field(..., title='ID')
-    username: str = Field(..., title='Имя пользователя')
-    balance: decimal.Decimal = Field(..., title='Баланс')
-    banker: bool = Field(..., title='Признак банкира')
-
-    class Config:
-        orm_mode = True
+# class UserFromDB(UserBase):
+#     id: int = Field(..., title='ID')
+#     username: str = Field(..., title='Имя пользователя')
+#     balance: decimal.Decimal = Field(..., title='Баланс')
+#     banker: bool = Field(..., title='Признак банкира')
+#
+#     class Config:
+#         orm_mode = True
 
 
 class UserLogin(BaseModel):

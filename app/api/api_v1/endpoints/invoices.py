@@ -1,43 +1,53 @@
 from typing import Any, List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from apps.auth.model import User
 from apps.bank.cruds import invoice
-from apps.bank.schemas.invoice import InvoiceUpdate, InvoiceView, InvoiceCreate, InvoiceFromDB
+from apps.bank.schemas.invoice import InvoiceUpdate, InvoiceView, InvoiceCreate
+from core.security import get_current_user
 
 router = APIRouter()
 
 
-@router.get('/{obj_id}', response_model=InvoiceFromDB)
-async def get_invoice(obj_id: int) -> Any:
-    result = await invoice.get(id=obj_id)
-    if not result:
-        raise HTTPException(status_code=404, detail='Invoice not found!')
-    return result
-
-
-@router.get('/', response_model=List[InvoiceFromDB])
+@router.get('/', response_model=List[InvoiceView])
 async def list_invoices(skip: int = 0, limit: int = 100) -> Any:
     results = await invoice.get_list(skip=skip, limit=limit)
     return results
 
 
+@router.get('/my', response_model=List[InvoiceView])
+async def list_my_invoices(user: User = Depends(get_current_user),
+                           skip: int = 0, limit: int = 100) -> Any:
+    results = await invoice.get_list(user=user, skip=skip, limit=limit)
+    return results
+
+
+@router.get('/{obj_id}', response_model=InvoiceView)
+async def get_invoice(obj_id: int,
+                      user: User = Depends(get_current_user)) -> Any:
+    result = await invoice.get(id=obj_id, user=user)
+    if not result:
+        raise HTTPException(status_code=404, detail='Invoice not found!')
+    return result
+
+
 @router.post('/create', response_model=InvoiceView, status_code=201)
-async def create_invoice(item: InvoiceCreate) -> Any:
-    result = await invoice.create(obj_in=item)
+async def create_invoice(item: InvoiceCreate, user: User = Depends(get_current_user)) -> Any:
+    result = await invoice.create(obj_in=item, user=user)
     return result
 
 
 @router.put('/{obj_id}', response_model=InvoiceView)
-async def update_invoice(obj_id: int, item: InvoiceUpdate) -> Any:
-    obj_db = await invoice.get(id=obj_id)
+async def update_invoice(obj_id: int, item: InvoiceUpdate, user: User = Depends(get_current_user)) -> Any:
+    obj_db = await invoice.get(id=obj_id, user=user)
     if not obj_db:
         raise HTTPException(status_code=404, detail='Invoice not found!')
-    result = await invoice.update(obj_db=obj_db, obj_in=item)
+    result = await invoice.update(obj_db=obj_db, obj_in=item, user=user)
     return result
 
 
 @router.delete('/{obj_id}')
-async def delete_invoice(obj_id: int) -> Any:
-    result = await invoice.remove(id=obj_id)
+async def delete_invoice(obj_id: int, user: User = Depends(get_current_user)) -> Any:
+    result = await invoice.remove(id=obj_id, user=user)
     return result
