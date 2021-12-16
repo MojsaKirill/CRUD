@@ -15,14 +15,14 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    email: Optional[str] = Field(None, title='Адрес e-mail')
+    email: Optional[str] = Field(None, title='Адрес e-mail', example='user@example.com')
 
-    @validator('email')
-    def _validate_email(cls, v: Any) -> Optional[str]:
-        if v:
-            if not validate_email(v):
-                raise ValueError('E-mail invalid')
-        return v
+    # @validator('email')
+    # def _validate_email(cls, v: Any) -> Optional[str]:
+    #     if v:
+    #         if not validate_email(v):
+    #             raise ValueError('E-mail invalid')
+    #     return v
 
 
 class UserView(UserBase):
@@ -45,8 +45,8 @@ class UserViewMe(UserBase):
 
 
 class UserCreate(UserBase):
-    username: str = Field(..., title='Имя пользователя')
-    password: str = Field(..., title='Пароль')
+    username: str = Field(..., title='Имя пользователя', example='User')
+    password: str = Field(..., title='Пароль', example='password')
     balance: Optional[decimal.Decimal] = Field(0, title='Баланс')
     banker: Optional[bool] = Field(False, title='Признак банкира')
 
@@ -54,3 +54,7 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     balance: Optional[decimal.Decimal] = Field(None, title='Баланс')
     banker: Optional[bool] = Field(None, title='Признак банкира')
+
+
+class UserForgotPassword(UserBase):
+    pass

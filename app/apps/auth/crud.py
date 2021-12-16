@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Optional, Union
 
-from sqlalchemy import select, insert, update
+from sqlalchemy import select, insert, update, func
 
 from apps.auth.model import User
 from apps.auth.schema import UserCreate, UserUpdate
-from core.exceptions import credentials_exception
+from core.exceptions import credentials_exception, user_already_exist, email_already_exist
 from core.utils import obj_to_dict, get_password_hash
 from db.session import SessionManager
 
@@ -18,11 +18,33 @@ async def get(id: int) -> Optional[User]:
     return result
 
 
-async def get_user_auth(user_name: str) -> Optional[User]:
-    select_stmt = select(User).where(User.username == user_name)
+async def get_user_by_name(user_name: str) -> Optional[User]:
+    select_stmt = select(User).where(func.upper(User.username) == func.upper(user_name))
     async with db.obtain_session() as sess:
         result = (await sess.execute(select_stmt)).scalar_one_or_none()
     return result
+
+
+async def get_user_by_email(user_email: str) -> Optional[User]:
+    select_stmt = select(User).where(func.upper(User.email) == func.upper(user_email))
+    async with db.obtain_session() as sess:
+        result = (await sess.execute(select_stmt)).scalar_one_or_none()
+    return result
+
+
+async def check_username_or_email(user_name: str, user_email: str = None):
+    select_stmt = select(User.id).where(func.upper(User.username) == func.upper(user_name))
+    async with db.obtain_session() as sess:
+        result = (await sess.execute(select_stmt)).scalar_one_or_none()
+    if result:
+        raise user_already_exist
+    if user_email:
+        select_stmt = select(User.id).where(func.upper(User.email) == func.upper(user_email))
+        async with db.obtain_session() as sess:
+            result = (await sess.execute(select_stmt)).scalar_one_or_none()
+        if result:
+            raise email_already_exist
+    return None
 
 
 async def get_list(skip: int = 0, limit: int = 100) -> List[User]:
