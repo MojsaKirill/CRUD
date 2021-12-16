@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = config('ACCESS_TOKEN_EXPIRE_MINUTES', cast=int, default=30)
     PROJECT_NAME: str = config('PROJECT_NAME', cast=str,
                                default='CRUD Project')
+    PROJECT_DESCRIPTION: str = config('PROJECT_DESCRIPTION', cast=str,
+                                      default='CRUD Project descriptions')
     PROJECT_VERSION: str = config('PROJECT_VERSION', cast=str,
                                   default='0.0.1')
     SQLALCHEMY_DATABASE_URL_ASYNC: str = config('SQLALCHEMY_DATABASE_URL_ASYNC', cast=str,
