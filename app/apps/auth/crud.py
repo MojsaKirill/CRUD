@@ -1,60 +1,51 @@
 from typing import Any, Dict, List, Optional, Union
 
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, update
 
 from apps.auth.model import User
 from apps.auth.schema import UserCreate, UserUpdate
-from core.utils import get_password_hash
+from core.exceptions import credentials_exception
+from core.utils import obj_to_dict, get_password_hash
 from db.session import SessionManager
 
 db = SessionManager()
 
 
 async def get(id: int) -> Optional[User]:
+    select_stmt = select(User).where(User.id == id)
     async with db.obtain_session() as sess:
-        select_stmt = select(User).where(User.id == id)
         result = (await sess.execute(select_stmt)).scalar_one_or_none()
     return result
 
 
 async def get_user_auth(user_name: str) -> Optional[User]:
+    select_stmt = select(User).where(User.username == user_name)
     async with db.obtain_session() as sess:
-        select_stmt = select(User).where(User.username == user_name)
         result = (await sess.execute(select_stmt)).scalar_one_or_none()
     return result
 
 
 async def get_list(skip: int = 0, limit: int = 100) -> List[User]:
+    select_stmt = select(User).offset(skip).limit(limit)
     async with db.obtain_session() as sess:
-        select_stmt = select(User).offset(skip).limit(limit)
         results = (await sess.execute(select_stmt)).scalars().all()
     return results
 
 
-async def create(obj_in: Union[UserCreate, Dict[str, Any]]) -> Optional[User]:
-    if isinstance(obj_in, dict):
-        insert_data = obj_in
-    else:
-        insert_data = obj_in.dict(exclude_unset=True)
+async def create_user(obj_in: Union[UserCreate, Dict[str, Any]]) -> Optional[User]:
+    insert_data = obj_to_dict(obj_in)
     insert_data['password'] = get_password_hash(insert_data['password'])
+    insert_stmt = insert(User).values(**insert_data).returning(User)
     async with db.obtain_session() as sess:
-        insert_stmt = insert(User).values(**insert_data).returning(User)
         result = (await sess.execute(insert_stmt)).mappings().first()
     return result
 
 
-async def update(obj_db: User, obj_in: Union[UserUpdate, Dict[str, Any]]) -> User:
-    if isinstance(obj_in, dict):
-        update_data = obj_in
-    else:
-        update_data = obj_in.dict(exclude_unset=True)
-    obj_data = jsonable_encoder(obj_db)
-
-    for field in obj_data:
-        if field in update_data:
-            setattr(obj_db, field, update_data[field])
-
+async def update_user(obj_db: User, obj_in: Union[UserUpdate, Dict[str, Any]], user: User) -> User:
+    if not user.banker and obj_db.id != user.id:
+        raise credentials_exception
+    update_data = obj_to_dict(obj_in)
+    update_stmt = update(User).where(User.id == obj_db.id).values(**update_data).returning(User)
     async with db.obtain_session() as sess:
-        sess.add(obj_db)
-    return obj_db
+        result = (await sess.execute(update_stmt)).mappings().first()
+    return result

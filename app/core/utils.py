@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Any, Optional
 
 from passlib.context import CryptContext
+from pydantic import BaseModel
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -64,3 +65,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
+
+
+def obj_to_dict(obj: Any):
+    if isinstance(obj, dict):
+        result = obj
+    elif isinstance(obj, BaseModel):
+        result = obj.dict(exclude_unset=True)
+    else:
+        result = None
+    return result
+

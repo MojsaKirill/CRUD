@@ -24,7 +24,7 @@ async def list_employees(skip: int = 0, limit: int = 100) -> Any:
 
 @router.post('/create', response_model=Employee, status_code=201)
 async def create_employee(item: EmployeeCreate) -> Any:
-    result = await cruds.employee.create(obj_in=item)
+    result = await cruds.employee.create_invoice(obj_in=item)
     return result
 
 
@@ -33,7 +33,7 @@ async def update_employee(obj_id: int, item: EmployeeUpdate) -> Any:
     obj_db = await cruds.employee.get(id=obj_id)
     if not obj_db:
         raise HTTPException(status_code=404, detail='Employee not found!')
-    result = await cruds.employee.update(obj_db=obj_db, obj_in=item)
+    result = await cruds.employee.update_invoice(obj_db=obj_db, obj_in=item)
     return result
 
 

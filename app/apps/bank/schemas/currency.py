@@ -24,3 +24,8 @@ class CurrencyCreate(CurrencyBase):
 
 class CurrencyUpdate(CurrencyBase):
     pass
+
+
+class CurrencyRateOnDate(BaseModel):
+    code: str = Field(..., title='Код', min_length=3, max_length=3)
+    date_start: datetime.date = Field(..., title='Дата')

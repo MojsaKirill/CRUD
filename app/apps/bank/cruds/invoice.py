@@ -2,13 +2,15 @@ from typing import Any, List, Optional, Union, Dict
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select, delete, insert, and_
+from sqlalchemy import select, delete, insert, and_, update
 from starlette import status
 from starlette.responses import JSONResponse
 
 from apps.auth.model import User
 from apps.bank.models.invoice import Invoice, Statuses
 from apps.bank.schemas.invoice import InvoiceCreate, InvoiceUpdate
+from core.exceptions import invoice_change_exception
+from core.utils import obj_to_dict
 from db.session import SessionManager
 
 db = SessionManager()
@@ -39,12 +41,9 @@ async def get_list(user: User = None,
     return results
 
 
-async def create(obj_in: Union[InvoiceCreate, Dict[str, Any]],
-                 user: User) -> Optional[Invoice]:
-    if isinstance(obj_in, dict):
-        insert_data = obj_in
-    else:
-        insert_data = obj_in.dict(exclude_unset=True)
+async def create_invoice(obj_in: Union[InvoiceCreate, Dict[str, Any]],
+                         user: User) -> Optional[Invoice]:
+    insert_data = obj_to_dict(obj_in)
     insert_data['user_id'] = user.id
     async with db.obtain_session() as sess:
         insert_stmt = insert(Invoice).values(**insert_data).returning(Invoice)
@@ -52,26 +51,22 @@ async def create(obj_in: Union[InvoiceCreate, Dict[str, Any]],
     return result
 
 
-async def update(obj_db: Invoice,
-                 obj_in: Union[InvoiceUpdate, Dict[str, Any]],
-                 user: User) -> Invoice:
-    if isinstance(obj_in, dict):
-        update_data = obj_in
-    else:
-        update_data = obj_in.dict(exclude_unset=True)
-    obj_data = jsonable_encoder(obj_db)
+async def update_invoice(obj_db: Invoice, obj_in: Union[InvoiceUpdate, Dict[str, Any]],
+                         user: User) -> Invoice:
+    if obj_db.status != Statuses.progress:
+        raise invoice_change_exception
+    if not user.banker and obj_db.user_id != user.id:
+        raise invoice_change_exception
 
-    for field in obj_data:
-        if field in update_data:
-            setattr(obj_db, field, update_data[field])
-
+    update_data = obj_to_dict(obj_in)
+    update_stmt = update(Invoice).where(Invoice.id == obj_db.id).values(**update_data)
+    update_stmt = update_stmt.returning(Invoice)
     async with db.obtain_session() as sess:
-        sess.add(obj_db)
-    return obj_db
+        result = (await sess.execute(update_stmt)).mappings().first()
+    return result
 
 
-async def remove(id: int,
-                 user: User) -> Any:
+async def remove(id: int, user: User) -> Any:
     async with db.obtain_session() as sess:
         result = await sess.execute(delete(Invoice).where(and_(
             Invoice.id == id,

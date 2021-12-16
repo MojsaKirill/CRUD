@@ -24,8 +24,7 @@ async def list_my_invoices(user: User = Depends(get_current_user),
 
 
 @router.get('/{obj_id}', response_model=InvoiceView)
-async def get_invoice(obj_id: int,
-                      user: User = Depends(get_current_user)) -> Any:
+async def get_invoice(obj_id: int, user: User = Depends(get_current_user)) -> Any:
     result = await invoice.get(id=obj_id, user=user)
     if not result:
         raise HTTPException(status_code=404, detail='Invoice not found!')
@@ -34,16 +33,17 @@ async def get_invoice(obj_id: int,
 
 @router.post('/create', response_model=InvoiceView, status_code=201)
 async def create_invoice(item: InvoiceCreate, user: User = Depends(get_current_user)) -> Any:
-    result = await invoice.create(obj_in=item, user=user)
+    result = await invoice.create_invoice(obj_in=item, user=user)
     return result
 
 
 @router.put('/{obj_id}', response_model=InvoiceView)
-async def update_invoice(obj_id: int, item: InvoiceUpdate, user: User = Depends(get_current_user)) -> Any:
+async def update_invoice(obj_id: int, item: InvoiceUpdate,
+                         user: User = Depends(get_current_user)) -> Any:
     obj_db = await invoice.get(id=obj_id, user=user)
     if not obj_db:
         raise HTTPException(status_code=404, detail='Invoice not found!')
-    result = await invoice.update(obj_db=obj_db, obj_in=item, user=user)
+    result = await invoice.update_invoice(obj_db=obj_db, obj_in=item, user=user)
     return result
 
 

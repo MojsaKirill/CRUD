@@ -15,7 +15,9 @@ class Settings(BaseSettings):
     FUTURE: bool = config('FUTURE', cast=bool, default=True)  # Use 2.0 SQLAlchemy style
     API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = config('SECRET_KEY', cast=str,
-                             default='FaOsibHOugjgCdQDAaC6Apnblx9m6aF6FPgHqAA/3WnSKDftsf2I99dAA5LEfFG5qJCVe3aqkXLyJ3pZ')
+                             default='FaOsibHOugjgCdQDAaC6Apnblx9m6aF6FPgHqAA/3WnSKD')
+    ALGORITHM: str = config('ALGORITHM', cast=str, default='HS256')
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = config('ACCESS_TOKEN_EXPIRE_MINUTES', cast=int, default=30)
     PROJECT_NAME: str = config('PROJECT_NAME', cast=str,
                                default='CRUD Project')
     PROJECT_VERSION: str = config('PROJECT_VERSION', cast=str,
@@ -24,12 +26,6 @@ class Settings(BaseSettings):
                                                 default='sqlite+aiosqlite:///./crud.db')
     SQLALCHEMY_DATABASE_URL_SYNC: str = config('SQLALCHEMY_DATABASE_URL_SYNC', cast=str,
                                                default='sqlite:///./crud.db')
-    FIRST_SUPERUSER_NAME: str = config('FIRST_SUPERUSER_NAME', cast=str,
-                                       default='admin')
-    FIRST_SUPERUSER_EMAIL: str = config('FIRST_SUPERUSER_EMAIL', cast=str,
-                                        default='admin@example.com')
-    FIRST_SUPERUSER_PASSWORD: str = config('FIRST_SUPERUSER_PASSWORD', cast=str,
-                                           default='123456')
 
 
 settings = Settings()

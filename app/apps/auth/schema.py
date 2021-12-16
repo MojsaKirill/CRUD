@@ -15,10 +15,7 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    # username: str = Field(..., title='Имя пользователя')
     email: Optional[str] = Field(None, title='Адрес e-mail')
-    # balance: decimal.Decimal = Field(..., title='Баланс')
-    # banker: bool = Field(..., title='Признак банкира')
 
     @validator('email')
     def _validate_email(cls, v: Any) -> Optional[str]:
@@ -29,6 +26,15 @@ class UserBase(BaseModel):
 
 
 class UserView(UserBase):
+    id: int = Field(..., title='ID')
+    username: str = Field(..., title='Имя пользователя')
+    banker: bool = Field(..., title='Признак банкира')
+
+    class Config:
+        orm_mode = True
+
+
+class UserViewMe(UserBase):
     id: int = Field(..., title='ID')
     username: str = Field(..., title='Имя пользователя')
     balance: decimal.Decimal = Field(..., title='Баланс')
@@ -48,18 +54,3 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     balance: Optional[decimal.Decimal] = Field(None, title='Баланс')
     banker: Optional[bool] = Field(None, title='Признак банкира')
-
-
-# class UserFromDB(UserBase):
-#     id: int = Field(..., title='ID')
-#     username: str = Field(..., title='Имя пользователя')
-#     balance: decimal.Decimal = Field(..., title='Баланс')
-#     banker: bool = Field(..., title='Признак банкира')
-#
-#     class Config:
-#         orm_mode = True
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str

@@ -24,7 +24,7 @@ async def list_persons(q: Optional[str] = None, skip: int = 0, limit: int = 100)
 
 @router.post('/create', response_model=Person, status_code=201)
 async def create_person(item: PersonCreate) -> Any:
-    result = await cruds.person.create(obj_in=item)
+    result = await cruds.person.create_invoice(obj_in=item)
     return result
 
 
@@ -33,7 +33,7 @@ async def update_person(obj_id: int, item: PersonUpdate) -> Any:
     obj_db = await cruds.person.get(id=obj_id)
     if not obj_db:
         raise HTTPException(status_code=404, detail='Person not found!')
-    result = await cruds.person.update(obj_db=obj_db, obj_in=item)
+    result = await cruds.person.update_invoice(obj_db=obj_db, obj_in=item)
     return result
 
 
