@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Any, Optional, List, Union, Dict
 
 from fastapi import HTTPException
@@ -7,6 +8,7 @@ from starlette.responses import JSONResponse
 
 from apps.bank.models.currency import Currency
 from apps.bank.schemas.currency import CurrencyCreate, CurrencyRateOnDate, CurrencyUpdate
+from apps.bank.utils.nbrb_rates import get_rate_date_code
 from core.utils import obj_to_dict
 from db.session import SessionManager
 
@@ -62,3 +64,30 @@ async def remove_currency(id: int) -> Any:
     if result.rowcount == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=404, detail=f'Record with id={id} not found')
+
+
+async def import_rate_start_date(date_start: str = None):
+    if not date_start:
+        last_date_stmt = select(func.max(Currency.date_start))
+        async with db.obtain_session() as sess:
+            max_date = (await sess.execute(last_date_stmt)).scalar_one_or_none()
+        if not max_date:
+            start_date = datetime.now() + timedelta(days=-3)
+        else:
+            start_date = max_date + timedelta(days=1)
+    else:
+        start_date = datetime.strptime(date_start, '%Y-%m-%d')
+
+    list_rates = await get_rate_date_code(start_date.strftime('%Y-%m-%d'))
+    curr_items = []
+    for rate in list_rates:
+        curr_items.append(Currency(code=rate['Cur_Abbreviation'],
+                                   scale=rate['Cur_Scale'],
+                                   rate=rate['Cur_OfficialRate'],
+                                   date_start=datetime.strptime(rate['Date'][0:10], '%Y-%m-%d')))
+
+    async with db.obtain_session() as sess:
+        sess.add_all(curr_items)
+    return {'Load rates starts': start_date}
+
+
