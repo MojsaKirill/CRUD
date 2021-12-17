@@ -9,7 +9,7 @@ class Currency(Base):
 
     id = Column(Integer, Identity(always=True), primary_key=True)
     code = Column(String(length=3), nullable=False)
-    scale = Column(SmallInteger, nullable=False, server_default='1')
+    scale = Column(Integer, nullable=False, server_default='1')
     rate = Column(Numeric(precision=10, scale=5), nullable=False)
     date_start = Column(Date(), nullable=False)
 
