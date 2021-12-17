@@ -1,14 +1,10 @@
-from typing import Optional
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-
-from apps.auth.model import User
 from core.config import settings
-from core.security import get_current_user
 
-router = APIRouter()
+router = APIRouter(tags=['Home'])
 
 
 @router.get('/')
-async def home(current_user: User = Depends(get_current_user)):
-    return {f'{current_user.username} welcome to API': settings.PROJECT_NAME}
+async def home():
+    return {'Welcome to API': settings.PROJECT_NAME}

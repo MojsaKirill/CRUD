@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from apps.auth.crud import get_user_by_name, check_username_or_email, create_user, get_user_by_email
-from apps.auth.schema import UserCreate, UserView, UserForgotPassword
+from apps.auth.schema import UserCreate, UserRegister, UserView, UserForgotPassword
 from core.exceptions import login_invalid_exception, ProjectException
 from core.security import create_access_token, get_current_user, get_token_user
 from core.utils import verify_password
@@ -13,7 +13,7 @@ router = APIRouter(prefix='/auth', tags=['Auth'])
 
 
 @router.post('/register', response_model=UserView, summary='Регистрация')
-async def auth_register(user: UserCreate):
+async def auth_register(user: UserRegister):
     result = await check_username_or_email(user.username, user.email)
     if not result:
         result = await create_user(user)

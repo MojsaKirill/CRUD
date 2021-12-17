@@ -4,26 +4,27 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from apps.auth.model import User
 from apps.bank.cruds import invoice
-from apps.bank.schemas.invoice import InvoiceUpdate, InvoiceView, InvoiceCreate
-from core.security import get_current_user
+from apps.bank.schemas.invoice import InvoiceUpdate, InvoiceView, InvoiceCreate, InvoiceViewFull
+from core.security import current_user_is_banker, get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix='/invoices', tags=['Invoices'])
 
 
-@router.get('/', response_model=List[InvoiceView])
+@router.get('/', response_model=List[InvoiceViewFull],
+            dependencies=[Depends(current_user_is_banker)])
 async def list_invoices(skip: int = 0, limit: int = 100) -> Any:
     results = await invoice.get_list(skip=skip, limit=limit)
     return results
 
 
-@router.get('/my', response_model=List[InvoiceView])
+@router.get('/my', response_model=List[InvoiceViewFull])
 async def list_my_invoices(user: User = Depends(get_current_user),
                            skip: int = 0, limit: int = 100) -> Any:
     results = await invoice.get_list(user=user, skip=skip, limit=limit)
     return results
 
 
-@router.get('/{obj_id}', response_model=InvoiceView)
+@router.get('/{obj_id}', response_model=InvoiceViewFull)
 async def get_invoice(obj_id: int, user: User = Depends(get_current_user)) -> Any:
     result = await invoice.get(id=obj_id, user=user)
     if not result:

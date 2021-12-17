@@ -1,14 +1,14 @@
 import datetime
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 
 from apps.bank.cruds import currency
 from apps.bank.schemas.currency import CurrencyCreate, CurrencyRateOnDate, CurrencyUpdate, \
     CurrencyView
 from core.security import current_user_is_banker
 
-router = APIRouter()
+router = APIRouter(prefix='/currencies', tags=['Currencies'])
 
 
 @router.get('/', response_model=List[CurrencyView])
@@ -18,7 +18,8 @@ async def list_currencies(skip: int = 0, limit: int = 100) -> Any:
 
 
 @router.get('/{code}/{date}', response_model=CurrencyView)
-async def get_code_rate(code: str, date: datetime.date) -> Any:
+async def get_code_rate(code: str = Path(..., min_length=3, max_length=3),
+                        date: datetime.date = Path(...)) -> Any:
     curr_rate = CurrencyRateOnDate(code=code, date_start=date)
     result = await currency.get_code_rate_on_date(curr_rate)
     return result

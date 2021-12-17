@@ -1,22 +1,14 @@
 # Основной файл проекта
-import logging
-# import os
-# import sys
-# import warnings
 
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from api.api_v1.api import api_router
-from api.api_v1.endpoints import oauth
+import core.events
+from api.router import router_api_v1
+from api.api_v1.endpoints import home, oauth
 
 from core.config import init_logging, settings
-
-
-# os.environ['SQLALCHEMY_WARN_20'] = 'True'
-# if not sys.warnoptions:
-#     warnings.simplefilter("default")
 from core.exceptions import ProjectException
 
 logger = init_logging(__name__)
@@ -27,18 +19,9 @@ app = FastAPI(title=settings.PROJECT_NAME,
               openapi_url=f'{settings.API_V1_STR}/openapi.json',
               debug=settings.DEBUG)
 
+app.include_router(home.router)
 app.include_router(oauth.router)
-app.include_router(api_router, prefix=settings.API_V1_STR)
-
-
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Starting up...")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Shutting down...")
+app.include_router(router_api_v1, prefix=settings.API_V1_STR)
 
 
 @app.exception_handler(ProjectException)

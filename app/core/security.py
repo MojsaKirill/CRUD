@@ -1,6 +1,5 @@
 import time
 from datetime import datetime, timedelta
-from typing import Optional
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer

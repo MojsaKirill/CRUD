@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from sqlalchemy import select, insert, update, func
 
 from apps.auth.model import User
-from apps.auth.schema import UserCreate, UserUpdate
+from apps.auth.schema import UserCreate, UserRegister, UserUpdate
 from core.exceptions import credentials_exception, user_already_exist, email_already_exist
 from core.utils import obj_to_dict, get_password_hash
 from db.session import SessionManager
@@ -54,7 +54,7 @@ async def get_list(skip: int = 0, limit: int = 100) -> List[User]:
     return results
 
 
-async def create_user(obj_in: Union[UserCreate, Dict[str, Any]]) -> Optional[User]:
+async def create_user(obj_in: Union[UserCreate, UserRegister, Dict[str, Any]]) -> Optional[User]:
     insert_data = obj_to_dict(obj_in)
     insert_data['password'] = get_password_hash(insert_data['password'])
     insert_stmt = insert(User).values(**insert_data).returning(User)

@@ -7,9 +7,11 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from apps.auth.model import User
+from apps.bank.cruds.currency import get_code_rate_on_date
 from apps.bank.models.invoice import Invoice, Statuses
+from apps.bank.schemas.currency import CurrencyRateOnDate
 from apps.bank.schemas.invoice import InvoiceCreate, InvoiceUpdate
-from core.exceptions import invoice_change_exception
+from core.exceptions import ProjectException, invoice_change_exception
 from core.utils import obj_to_dict
 from db.session import SessionManager
 
@@ -26,15 +28,10 @@ async def get(id: Any, user: User) -> Optional[Invoice]:
     return result
 
 
-async def get_list(user: User = None,
-                   skip: int = 0,
-                   limit: int = 100) -> List[Invoice]:
+async def get_list(user: User = None, skip: int = 0, limit: int = 100) -> List[Invoice]:
     select_stmt = select(Invoice)
     if user:
-        if user.banker:
-            select_stmt = select_stmt.where(Invoice.status == Statuses.progress)
-        else:
-            select_stmt = select_stmt.where(Invoice.user_id == user.id)
+        select_stmt = select_stmt.where(Invoice.user_id == user.id)
     select_stmt = select_stmt.offset(skip).limit(limit)
     async with db.obtain_session() as sess:
         results = (await sess.execute(select_stmt)).scalars().all()
@@ -45,6 +42,15 @@ async def create_invoice(obj_in: Union[InvoiceCreate, Dict[str, Any]],
                          user: User) -> Optional[Invoice]:
     insert_data = obj_to_dict(obj_in)
     insert_data['user_id'] = user.id
+
+    curr_rate = CurrencyRateOnDate(code=insert_data['curr_code'],
+                                   date_start=insert_data['inv_date'])
+    rate = await get_code_rate_on_date(curr_rate)
+    if not rate:
+        raise ProjectException(status_code=404, detail='Not found rate for this currency')
+    insert_data.pop('curr_code')
+    insert_data['currency_id'] = rate.id
+
     async with db.obtain_session() as sess:
         insert_stmt = insert(Invoice).values(**insert_data).returning(Invoice)
         result = (await sess.execute(insert_stmt)).mappings().first()

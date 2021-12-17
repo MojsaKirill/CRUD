@@ -18,6 +18,15 @@ class CurrencyView(CurrencyBase):
         orm_mode = True
 
 
+class CurrencyViewJoin(BaseModel):
+    code: str = Field(..., title='Код')
+    scale: int = Field(1, title='Шкала')
+    rate: decimal.Decimal = Field(..., title='Курс')
+
+    class Config:
+        orm_mode = True
+
+
 class CurrencyCreate(CurrencyBase):
     pass
 

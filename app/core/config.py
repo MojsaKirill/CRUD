@@ -58,13 +58,13 @@ LOGGING_CONFIG = {
         'file_handler': {
             'class': 'logging.FileHandler',
             'formatter': 'default_formatter',
-            'filename': str(BASE_DIR) + '/main.log',
+            'filename': str(BASE_DIR) + '/logs/main.log',
             'encoding': 'UTF-8',
         },
         'file_handler_db': {
             'class': 'logging.FileHandler',
             'formatter': 'default_formatter',
-            'filename': str(BASE_DIR) + '/db.log',
+            'filename': str(BASE_DIR) + '/logs/db.log',
             'encoding': 'UTF-8',
         },
         'stream_handler': {

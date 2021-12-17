@@ -1,7 +1,7 @@
 from typing import Any, Optional, List, Union, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import and_, desc, select, delete, insert, update
+from sqlalchemy import and_, desc, func, select, delete, insert, update
 from starlette import status
 from starlette.responses import JSONResponse
 
@@ -22,7 +22,7 @@ async def get(id: Any) -> Optional[Currency]:
 
 async def get_code_rate_on_date(item: CurrencyRateOnDate) -> Optional[Currency]:
     select_stmt = select(Currency).where(
-        and_(Currency.code == item.code,
+        and_(func.upper(Currency.code) == func.upper(item.code),
              Currency.date_start <= item.date_start)
     ).order_by(desc(Currency.date_start)).limit(1)
     async with db.obtain_session() as sess:

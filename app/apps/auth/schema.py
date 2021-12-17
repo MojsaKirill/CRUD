@@ -1,7 +1,7 @@
 import decimal
 from typing import Optional, Any
 
-from email_validator import validate_email
+# from email_validator import validate_email
 from pydantic import BaseModel, Field, validator
 
 
@@ -44,11 +44,23 @@ class UserViewMe(UserBase):
         orm_mode = True
 
 
+class UserViewJoin(BaseModel):
+    username: str = Field(..., title='Имя пользователя')
+
+    class Config:
+        orm_mode = True
+
+
 class UserCreate(UserBase):
     username: str = Field(..., title='Имя пользователя', example='User')
     password: str = Field(..., title='Пароль', example='password')
     balance: Optional[decimal.Decimal] = Field(0, title='Баланс')
     banker: Optional[bool] = Field(False, title='Признак банкира')
+
+
+class UserRegister(UserBase):
+    username: str = Field(..., title='Имя пользователя', example='User')
+    password: str = Field(..., title='Пароль', example='password')
 
 
 class UserUpdate(UserBase):
