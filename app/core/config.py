@@ -1,5 +1,6 @@
 # Конфигурация проекта
 import logging.config
+from functools import lru_cache
 from logging import Logger
 from pathlib import Path
 
@@ -30,7 +31,12 @@ class Settings(BaseSettings):
                                                default='sqlite:///./crud.db')
 
 
-settings = Settings()
+@lru_cache()
+def get_settings():
+    return Settings()
+
+
+settings = get_settings()
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -82,7 +88,7 @@ LOGGING_CONFIG = {
         'db.session': {
             'handlers': ['file_handler_db'],
             'level': 'DEBUG',
-            # 'propagate': True
+            'propagate': True
         },
     }
 }

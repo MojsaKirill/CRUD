@@ -29,14 +29,23 @@ class SessionManager:
 
     @asynccontextmanager
     async def obtain_session(self) -> AsyncSession:
+        logger.debug('Create session...')
         session = self._session_factory()
+        logger.debug('Session created...')
         try:
+            logger.debug('Run statement...')
             yield session
+            logger.debug('Committing...')
             await session.commit()
+            logger.debug('Committed.')
         except Exception as e:
             logger.error('Obtain session: failed')
             logger.exception(e)
+            logger.debug('Rollback transaction...')
             await session.rollback()
+            logger.debug('Rollback done.')
             raise DBOperationError(e)
         finally:
+            logger.debug('Closing connection...')
             await session.close()
+            logger.debug('Connection closed.')
