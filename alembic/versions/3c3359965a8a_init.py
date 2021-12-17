@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('currencies',
     sa.Column('id', sa.Integer(), sa.Identity(always=True), nullable=False),
     sa.Column('code', sa.String(length=3), nullable=False),
-    sa.Column('scale', sa.SmallInteger(), server_default='1', nullable=False),
+    sa.Column('scale', sa.Integer(), server_default='1', nullable=False),
     sa.Column('rate', sa.Numeric(precision=10, scale=5), nullable=False),
     sa.Column('date_start', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
