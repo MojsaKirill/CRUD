@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import Column, Date, Integer, ForeignKey, Enum, Numeric, Identity, func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 from db.session import Base
@@ -25,3 +26,7 @@ class Invoice(Base):
 
     user = relationship('User', back_populates='invoices', lazy='joined', innerjoin=False)
     currency = relationship('Currency', back_populates='invoices', lazy='joined', innerjoin=False)
+
+    @hybrid_property
+    def byn_count(self):
+        return round(self.currency.rate_one * self.curr_count, 2)

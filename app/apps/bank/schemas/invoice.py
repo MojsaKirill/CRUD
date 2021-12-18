@@ -33,11 +33,12 @@ class InvoiceView(InvoiceBase):
 
 class InvoiceViewFull(BaseModel):
     id: int = Field(..., title='ID')
-    # user_id: int = Field(..., title='Код пользователя')
+    user_id: int = Field(..., title='Код пользователя')
     user: UserViewJoin = Field(..., title='Пользователь')
-    # currency_id: int = Field(..., title='Код валюты')
+    currency_id: int = Field(..., title='Код валюты')
     currency: CurrencyViewJoin = Field(..., title='Валюта')
     curr_count: decimal.Decimal = Field(..., title='Количество')
+    byn_count: decimal.Decimal = None
     inv_date: datetime.date = Field(..., title='Дата заявки')
     status: Statuses = Field(..., title='Статус')
 

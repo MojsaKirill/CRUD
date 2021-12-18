@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Index, Integer, String, Numeric, Date, Identity, SmallInteger
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Index, Integer, String, Numeric, Date, Identity
+from sqlalchemy.orm import relationship, column_property
 
 from db.session import Base
 
@@ -12,6 +12,7 @@ class Currency(Base):
     scale = Column(Integer, nullable=False, server_default='1')
     rate = Column(Numeric(precision=10, scale=5), nullable=False)
     date_start = Column(Date(), nullable=False)
+    rate_one = column_property(rate / scale)
 
     invoices = relationship('Invoice', back_populates='currency')
 
