@@ -1,7 +1,6 @@
 from typing import Any, List, Optional, Union, Dict
 
 from fastapi import HTTPException
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select, delete, insert, and_, update
 from starlette import status
 from starlette.responses import JSONResponse

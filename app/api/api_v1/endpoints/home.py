@@ -12,7 +12,7 @@ async def home():
 
 
 @router.get('/rate/{date}')
-async def home(date: str):
+async def home(date: str = None):
     # result = await import_rate_start_date(date)
     result = await import_rate_start_date()
     return result
