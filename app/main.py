@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 import core.events
 from api.router import router_api_v1
-from api.api_v1.endpoints import home, oauth
+from api.api_v1.endpoints import home, oauth, tasks
 
 from core.config import init_logging, settings
 from core.exceptions import ProjectException
@@ -19,6 +19,7 @@ app = FastAPI(title=settings.PROJECT_NAME,
               openapi_url=f'{settings.API_V1_STR}/openapi.json',
               debug=settings.DEBUG)
 
+app.include_router(tasks.router)
 app.include_router(home.router)
 app.include_router(oauth.router)
 app.include_router(router_api_v1, prefix=settings.API_V1_STR)
