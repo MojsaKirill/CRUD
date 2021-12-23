@@ -22,6 +22,7 @@ async def get(id: Any) -> Optional[Currency]:
     return result
 
 
+#TODO first()
 async def get_code_rate_on_date(item: CurrencyRateOnDate) -> Optional[Currency]:
     select_stmt = select(Currency).where(
         and_(func.upper(Currency.code) == func.upper(item.code),
@@ -61,6 +62,7 @@ async def remove_currency(id: int) -> Any:
     delete_stmt = delete(Currency).where(Currency.id == id)
     async with db.obtain_session() as sess:
         result = await sess.execute(delete_stmt)
+    #TODO
     if result.rowcount == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=404, detail=f'Record with id={id} not found')

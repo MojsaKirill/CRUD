@@ -34,6 +34,7 @@ async def get_user_by_email(user_email: str) -> Optional[User]:
 
 async def check_username_or_email(user_name: str, user_email: str = None):
     select_stmt = select(User.id).where(func.upper(User.username) == func.upper(user_name))
+    #TODO
     async with db.obtain_session() as sess:
         result = (await sess.execute(select_stmt)).scalar_one_or_none()
     if result:
@@ -44,6 +45,7 @@ async def check_username_or_email(user_name: str, user_email: str = None):
             result = (await sess.execute(select_stmt)).scalar_one_or_none()
         if result:
             raise email_already_exist
+    #TODO
     return None
 
 
@@ -54,10 +56,12 @@ async def get_list(skip: int = 0, limit: int = 100) -> List[User]:
     return results
 
 
+#TOOD
 async def create_user(obj_in: Union[UserCreate, UserRegister, Dict[str, Any]]) -> Optional[User]:
     insert_data = obj_to_dict(obj_in)
     insert_data['password'] = get_password_hash(insert_data['password'])
-    insert_stmt = insert(User).values(**insert_data).returning(User)
+    obj_in.password = get_password_hash(obj_in.password)
+    insert_stmt = insert(User).values(User(username=obj_in.username, )).returning(User)
     async with db.obtain_session() as sess:
         result = (await sess.execute(insert_stmt)).mappings().first()
     return result

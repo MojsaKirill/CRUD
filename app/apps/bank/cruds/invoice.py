@@ -78,6 +78,7 @@ async def remove(id: int, user: User) -> Any:
             Invoice.user_id == user.id,
             Invoice.status == Statuses.progress
         )))
+    #TODO
     if result.rowcount == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=404, detail=f'Record with id={id} not found')

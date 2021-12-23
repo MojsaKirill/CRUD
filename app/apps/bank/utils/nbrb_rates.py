@@ -29,6 +29,7 @@ async def get_rate_date_code(date: str, code: str = None):
 
 
 async def _get_rate(date: str, code: str = None):
+    #TODO
     main_url = 'https://www.nbrb.by/api/exrates/rates'
     if not code:
         url = main_url + f'?ondate={date}&periodicity=0'
